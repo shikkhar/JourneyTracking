@@ -10,9 +10,10 @@ public class CONSTANTS {
     }
 
     public static class QuerySelector {
-        public static final String INSERT_RIDE = "insert_new_ride";
-        public static final String UPDATE_RIDE  = "update_ride";
-        public static final String INSERT_LOCATION_UPDATE = "insert_location_update";
+        public static final String INSERT_RIDE = "inr";
+        public static final String UPDATE_RIDE  = "ur";
+        public static final String INSERT_LOCATION_UPDATE = "ilu";
+        public static final String FETCH_RIDE_LIST = "frl";
     }
 
 }

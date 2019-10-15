@@ -19,6 +19,7 @@ import com.example.journeytracking.RideHistoryModule.RideHistoryActivity;
 import com.example.journeytracking.Service.TrackingService;
 import com.example.journeytracking.Utils.DbManager;
 import com.example.journeytracking.Utils.SharedPrefManager;
+import com.example.journeytracking.Utils.Utils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -28,6 +29,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.button.MaterialButton;
+
+import java.util.Calendar;
 
 
 public class TrackingActivity extends TrackingPermissionManager implements OnMapReadyCallback,
@@ -49,6 +52,7 @@ public class TrackingActivity extends TrackingPermissionManager implements OnMap
 
     private MaterialButton startTrackingButton;
     private MaterialButton stopTrackingButton;
+    private MaterialButton rideHistoryButton;
     private TextView distanceCoveredTextView;
     private TextView timerTextView;
 
@@ -73,11 +77,13 @@ public class TrackingActivity extends TrackingPermissionManager implements OnMap
 
         startTrackingButton = this.findViewById(R.id.buttonStartTracking);
         stopTrackingButton = this.findViewById(R.id.buttonStopTracking);
+        rideHistoryButton = this.findViewById(R.id.buttonRideHistory);
         distanceCoveredTextView = this.findViewById(R.id.textViewDistance);
         timerTextView = this.findViewById(R.id.textViewTimer);
 
         startTrackingButton.setOnClickListener(new StartTrackingClickListener());
         stopTrackingButton.setOnClickListener(new StopTrackingClickListener());
+        rideHistoryButton.setOnClickListener(new RideHistoryClickListener());
 
         serviceIntent = new Intent(getApplicationContext(), TrackingService.class);
         serviceConnection = new TrackingServiceConnection();
@@ -95,7 +101,7 @@ public class TrackingActivity extends TrackingPermissionManager implements OnMap
             startTrackingButton.setEnabled(false);
 
             if (startLocationMarker != null) {
-                mPresenter.insertNewRide(startLocationMarker.getPosition());
+                mPresenter.insertNewRide(startLocationMarker.getPosition(), false, Utils.getDateTime());
                 trackingService.removeLocationUpdates();
             }
         }
@@ -109,8 +115,16 @@ public class TrackingActivity extends TrackingPermissionManager implements OnMap
 
             stopTrackingButton.setEnabled(false);
             trackingService.removeLocationUpdates();
-            mPresenter.updateCurrentRide(currentLocationMarker.getPosition(), distanceCovered, true, currentRideId);
+            mPresenter.updateCurrentRide(currentLocationMarker.getPosition(), distanceCovered, true, Utils. getDateTime(), currentRideId);
             //locationUpdatesRequested = false;
+        }
+    }
+
+    private class RideHistoryClickListener implements View.OnClickListener{
+        @Override
+        public void onClick(View v) {
+            /*Intent intent = new Intent(TrackingActivity.this, TestActivity.class);
+            startActivity(intent);*/
         }
     }
 

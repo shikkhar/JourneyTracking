@@ -23,18 +23,25 @@ public class RideDetails {
 
     public boolean isRideComplete;
 
+    public String startTime;
+
+    public String endTime;
+
     @Ignore
-    public RideDetails(double endLatitude, double endLongitude, double distanceCovered, boolean isRideComplete,  long rideId) {
+    public RideDetails(double endLatitude, double endLongitude, double distanceCovered, boolean isRideComplete, String endTime, long rideId) {
 
         this.endLatitude = endLatitude;
         this.endLongitude = endLongitude;
         this.distanceCovered = distanceCovered;
+        this.isRideComplete = isRideComplete;
+        this.endTime = endTime;
         this.id = rideId;
     }
 
-    public RideDetails(double startLatitude, double startLongitude, boolean isRideComplete) {
+    public RideDetails(double startLatitude, double startLongitude, boolean isRideComplete, String startTime) {
         this.startLatitude = startLatitude;
         this.startLongitude = startLongitude;
         this.isRideComplete = isRideComplete;
+        this.startTime = startTime;
     }
 }

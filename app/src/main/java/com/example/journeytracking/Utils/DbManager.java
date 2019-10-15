@@ -4,6 +4,10 @@ import com.example.journeytracking.Data.RideDatabase;
 import com.example.journeytracking.Data.RideDetails;
 import com.example.journeytracking.Data.RideLocationUpdates;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.example.journeytracking.Utils.CONSTANTS.QuerySelector.*;
 
 public class DbManager {
@@ -16,24 +20,26 @@ public class DbManager {
 
     public void insertRideDetails(RideDetails rideDetails, DbOperationCallback dbOperationCallback) {
 
-        DbQueryExecutor executor  = new DbQueryExecutor<RideDetails>(db, dbOperationCallback, INSERT_RIDE);
+        DbQueryExecutor executor  = new DbQueryExecutor<RideDetails, Long>(db, dbOperationCallback, INSERT_RIDE, Long.class);
         executor.execute(rideDetails);
-        /*InsertRideDetailsAsyncTask asyncTask = new InsertRideDetailsAsyncTask(dbOperationCallback);
-        asyncTask.execute(new RideDetails[] {rideDetails});*/
+
     }
 
     public void insertLocationUpdates(RideLocationUpdates locationUpdates, DbOperationCallback dbOperationCallback) {
-        DbQueryExecutor executor  = new DbQueryExecutor<RideLocationUpdates>(db, dbOperationCallback, INSERT_LOCATION_UPDATE);
+        DbQueryExecutor executor  = new DbQueryExecutor<RideLocationUpdates, Long>(db, dbOperationCallback, INSERT_LOCATION_UPDATE, Long.class);
         executor.execute(locationUpdates);
-       /*InsertLocationUpdatesAsyncTask asyncTask = new InsertLocationUpdatesAsyncTask(dbOperationCallback);
-       asyncTask.execute(new RideLocationUpdates[] {locationUpdates});*/
+
     }
 
     public void updateRideDetails(RideDetails rideDetails, DbOperationCallback dbOperationCallback) {
-        DbQueryExecutor executor  = new DbQueryExecutor<RideDetails>(db, dbOperationCallback, UPDATE_RIDE);
+        DbQueryExecutor executor  = new DbQueryExecutor<RideDetails, Integer>(db, dbOperationCallback, UPDATE_RIDE, Integer.class);
         executor.execute(rideDetails);
-        /*UpdateRideDetailsAsyncTask asyncTask = new UpdateRideDetailsAsyncTask(dbOperationCallback);
-        asyncTask.execute(new RideDetails[] {rideDetails});*/
+
+    }
+
+    public void getRideDetails(DbOperationCallback dbOperationCallback) {
+        DbQueryExecutor executor  = new DbQueryExecutor<Void, ArrayList>(db, dbOperationCallback, FETCH_RIDE_LIST, ArrayList.class);
+        executor.execute();
     }
 
 
@@ -114,5 +120,6 @@ public class DbManager {
         void onInsertRide(long insertedRowId);
         void onInsertLocationUpdate(long insertedRowId);
         void onUpdateRide();
+        void onRideListFetched(ArrayList<RideDetails> rideDetailsList);
     }
 }

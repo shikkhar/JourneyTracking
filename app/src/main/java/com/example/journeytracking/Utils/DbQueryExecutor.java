@@ -7,23 +7,26 @@ import com.example.journeytracking.Data.RideDetails;
 import com.example.journeytracking.Data.RideLocationUpdates;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 
 import static com.example.journeytracking.Utils.CONSTANTS.QuerySelector.*;
 
-public class DbQueryExecutor<S> extends AsyncTask<S, Void, Long> {
+public class DbQueryExecutor<S, T> extends AsyncTask<S, Void, T> {
 
     private RideDatabase db;
     private WeakReference<DbManager.DbOperationCallback> dbOperationCallback;
     private String querySelection;
+    private Class<T> clazz;
 
-    public DbQueryExecutor(RideDatabase db, DbManager.DbOperationCallback dbOperationCallback, String querySelection) {
+    public DbQueryExecutor(RideDatabase db, DbManager.DbOperationCallback dbOperationCallback, String querySelection, Class<T> clazz) {
         this.db = db;
         this.dbOperationCallback = new WeakReference<>(dbOperationCallback);
         this.querySelection = querySelection;
+        this.clazz = clazz;
     }
 
     @Override
-    protected Long doInBackground(S... s) {
+    protected T doInBackground(S... s) {
 
         try {
             return executeQuery(s);
@@ -36,48 +39,54 @@ public class DbQueryExecutor<S> extends AsyncTask<S, Void, Long> {
     }
 
     @Override
-    protected void onPostExecute(Long value) {
+    protected void onPostExecute(T value) {
         initiateCallback(value);
     }
 
-    private void initiateCallback(Long value) {
+    private void initiateCallback(T value) {
         DbManager.DbOperationCallback dbOperationCallback = this.dbOperationCallback.get();
         if (dbOperationCallback != null) {
 
             switch (querySelection) {
 
                 case INSERT_RIDE:
-                    dbOperationCallback.onInsertRide(value);
+                    dbOperationCallback.onInsertRide((Long) value);
                     break;
 
                 case INSERT_LOCATION_UPDATE:
-                    dbOperationCallback.onInsertLocationUpdate(value);
+                    dbOperationCallback.onInsertLocationUpdate((Long) value);
                     break;
 
                 case UPDATE_RIDE:
                     dbOperationCallback.onUpdateRide();
+                    break;
+                case FETCH_RIDE_LIST:
+                    dbOperationCallback.onRideListFetched((ArrayList<RideDetails>) value);
                     break;
 
             }
         }
     }
 
-    private Long executeQuery(S[] s) throws Exception {
+    private T executeQuery(S[] s) throws Exception {
         switch (querySelection) {
 
             case INSERT_RIDE:
-                return db.rideDetailsDao().insertRideDetails((RideDetails) s[0]);
+                return clazz.cast(db.rideDetailsDao().insertRideDetails((RideDetails) s[0]));
 
             case INSERT_LOCATION_UPDATE:
-                return db.rideLocationUpdatesDao().insertRideLocationUpdates((RideLocationUpdates) s[0]);
+                return clazz.cast(db.rideLocationUpdatesDao().insertRideLocationUpdates((RideLocationUpdates) s[0]));
 
             case UPDATE_RIDE:
-                Long result = Long.valueOf(db.rideDetailsDao().updateRideDetails(((RideDetails) s[0]).endLatitude,
+                return clazz.cast(db.rideDetailsDao().updateRideDetails(((RideDetails) s[0]).endLatitude,
                         ((RideDetails) s[0]).endLongitude,
                         ((RideDetails) s[0]).distanceCovered,
                         ((RideDetails) s[0]).isRideComplete,
+                        ((RideDetails) s[0]).endTime,
                         ((RideDetails) s[0]).id));
-                return result;
+
+            case FETCH_RIDE_LIST:
+                return clazz.cast(db.rideDetailsDao().getRideDetailsList());
 
             default:
                 return null;

@@ -5,12 +5,13 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Dao
 public interface RideDetailsDao {
 
-    @Query("Select * from ride_details")
+    @Query("Select * from ride_details ORDER BY id DESC")
     List<RideDetails> getRideDetailsList ();
 
     @Insert
@@ -20,9 +21,10 @@ public interface RideDetailsDao {
             "SET endLatitude = :endLocationLatitude, " +
             "endLongitude = :endLocationLongitude, " +
             "distanceCovered = :distanceCovered, " +
-            "isRideComplete = :isRideComplete " +
-            "WHERE id = :rideId")
-    int updateRideDetails(double endLocationLatitude, double endLocationLongitude, double distanceCovered, boolean isRideComplete, long rideId);
+            "isRideComplete = :isRideComplete, " +
+            "endTime = :endTime " +
+            "WHERE id = :rideId ")
+    int updateRideDetails(double endLocationLatitude, double endLocationLongitude, double distanceCovered, boolean isRideComplete, String endTime, long rideId);
 
     @Delete
     int deleteRideDetails(RideDetails rideDetails);

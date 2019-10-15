@@ -12,6 +12,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 
 public class TrackingPresenter implements TrackingContract.Presenter {
 
@@ -24,8 +25,8 @@ public class TrackingPresenter implements TrackingContract.Presenter {
     }
 
     @Override
-    public void insertNewRide(LatLng startLocation) {
-        RideDetails rideDetails = new RideDetails(startLocation.latitude, startLocation.longitude, false);
+    public void insertNewRide(LatLng startLocation, boolean isRideComplete, String startTime) {
+        RideDetails rideDetails = new RideDetails(startLocation.latitude, startLocation.longitude, isRideComplete, startTime);
         dbManager.insertRideDetails(rideDetails, new DbOperationCallbackImpl(mView));
     }
 
@@ -36,8 +37,8 @@ public class TrackingPresenter implements TrackingContract.Presenter {
     }
 
     @Override
-    public void updateCurrentRide(LatLng endLocation, double distanceCovered, boolean isRideComplete, long rideId) {
-        RideDetails rideDetails = new RideDetails(endLocation.latitude, endLocation.longitude, distanceCovered, isRideComplete, rideId );
+    public void updateCurrentRide(LatLng endLocation, double distanceCovered, boolean isRideComplete, String endTime,  long rideId) {
+        RideDetails rideDetails = new RideDetails(endLocation.latitude, endLocation.longitude, distanceCovered, isRideComplete, endTime, rideId );
         dbManager.updateRideDetails(rideDetails, new DbOperationCallbackImpl(mView));
     }
 
@@ -70,6 +71,11 @@ public class TrackingPresenter implements TrackingContract.Presenter {
             if(view != null){
                 view.onRideUpdated();
             }
+        }
+
+        @Override
+        public void onRideListFetched(ArrayList<RideDetails> rideDetailsList) {
+
         }
     }
 
