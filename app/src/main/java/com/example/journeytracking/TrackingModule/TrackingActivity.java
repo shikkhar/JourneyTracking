@@ -1,16 +1,9 @@
 package com.example.journeytracking.TrackingModule;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.FragmentActivity;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import android.Manifest;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -18,11 +11,14 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import com.example.journeytracking.AppController;
 import com.example.journeytracking.R;
-import com.example.journeytracking.Utils.AppLocationManager;
+import com.example.journeytracking.RideHistoryModule.RideHistoryActivity;
+import com.example.journeytracking.Service.TrackingService;
 import com.example.journeytracking.Utils.DbManager;
+import com.example.journeytracking.Utils.SharedPrefManager;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -33,12 +29,12 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.button.MaterialButton;
 
-import static com.example.journeytracking.TrackingModule.TrackingService.ACTION_BROADCAST;
-import static com.example.journeytracking.TrackingModule.TrackingService.CURRENT_LOCATION;
-import static com.example.journeytracking.TrackingModule.TrackingService.END_LOCATION;
 
+public class TrackingActivity extends TrackingPermissionManager implements OnMapReadyCallback,
+        TrackingContract.View, TrackingService.NewLocationCallback {
 
-public class TrackingActivity extends FragmentActivity implements OnMapReadyCallback, TrackingContract.View {
+    private enum StateSelector {RIDE_START, RIDE_STOP, DEFAULT}
+
 
     private static final String TAG = "TrackingActivity";
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 1;
@@ -49,17 +45,17 @@ public class TrackingActivity extends FragmentActivity implements OnMapReadyCall
     private Intent serviceIntent;
     private TrackingServiceConnection serviceConnection;
     private boolean mBound = false;
-    private AppLocationManager appLocationManager;
+    private SharedPrefManager sharedPrefManager;
 
     private MaterialButton startTrackingButton;
     private MaterialButton stopTrackingButton;
+    private TextView distanceCoveredTextView;
+    private TextView timerTextView;
 
-    private MyBroadcastReceiver myBroadcastReceiver;
 
     private Marker startLocationMarker;
     private Marker currentLocationMarker;
 
-    private boolean locationUpdatesRequested = false;
 
     private long currentRideId;
     private double distanceCovered;
@@ -70,16 +66,21 @@ public class TrackingActivity extends FragmentActivity implements OnMapReadyCall
         setContentView(R.layout.activity_tracking);
 
         mPresenter = new TrackingPresenter(this, new DbManager(AppController.getInstance().getRideDatabaseInstance()));
-        myBroadcastReceiver = new MyBroadcastReceiver();
-        appLocationManager = new AppLocationManager(this);
+//        myBroadcastReceiver = new MyBroadcastReceiver();
+//        appLocationManager = new AppLocationManager(this);
+        sharedPrefManager = new SharedPrefManager(getApplicationContext());
+        sharedPrefManager.setRideStarted(false);
 
         startTrackingButton = this.findViewById(R.id.buttonStartTracking);
         stopTrackingButton = this.findViewById(R.id.buttonStopTracking);
+        distanceCoveredTextView = this.findViewById(R.id.textViewDistance);
+        timerTextView = this.findViewById(R.id.textViewTimer);
 
         startTrackingButton.setOnClickListener(new StartTrackingClickListener());
         stopTrackingButton.setOnClickListener(new StopTrackingClickListener());
 
         serviceIntent = new Intent(getApplicationContext(), TrackingService.class);
+        serviceConnection = new TrackingServiceConnection();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -91,23 +92,24 @@ public class TrackingActivity extends FragmentActivity implements OnMapReadyCall
     private class StartTrackingClickListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
-//            locationUpdatesRequested = true;
-            distanceCovered = 0;
-            mPresenter.insertNewRide(startLocationMarker.getPosition());
-            trackingService.removeLocationUpdates();
-            if (!checkPermissions()) {
-                requestPermissions();
-            } else {
-                trackingService.requestLocationUpdates();
+            startTrackingButton.setEnabled(false);
+
+            if (startLocationMarker != null) {
+                mPresenter.insertNewRide(startLocationMarker.getPosition());
+                trackingService.removeLocationUpdates();
             }
         }
     }
 
+
+
     private class StopTrackingClickListener implements View.OnClickListener {
         @Override
         public void onClick(View v) {
+
+            stopTrackingButton.setEnabled(false);
             trackingService.removeLocationUpdates();
-            mPresenter.updateCurrentRide(currentLocationMarker.getPosition(), 0, currentRideId);
+            mPresenter.updateCurrentRide(currentLocationMarker.getPosition(), distanceCovered, true, currentRideId);
             //locationUpdatesRequested = false;
         }
     }
@@ -119,10 +121,7 @@ public class TrackingActivity extends FragmentActivity implements OnMapReadyCall
             trackingService = ((TrackingService.LocalBinder) service).getService();
             mBound = true;
 
-            if (!checkPermissions())
-                requestPermissions();
-            else
-                trackingService.requestLocationUpdates();
+            startReceivingUpdates();
         }
 
         @Override
@@ -135,27 +134,23 @@ public class TrackingActivity extends FragmentActivity implements OnMapReadyCall
     @Override
     protected void onStart() {
         super.onStart();
-        serviceConnection = new TrackingServiceConnection();
-        bindService(serviceIntent, serviceConnection, BIND_AUTO_CREATE);
+        if (!mBound && serviceConnection != null)
+            bindService(serviceIntent, serviceConnection, BIND_AUTO_CREATE);
+        /*else {
+            if (!sharedPrefManager.isRideStarted())
+                startReceivingUpdates();
+        }*/
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        LocalBroadcastManager.getInstance(this).registerReceiver(myBroadcastReceiver, new IntentFilter(ACTION_BROADCAST));
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(myBroadcastReceiver);
-    }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (mBound && serviceConnection != null)
+        if (mBound && serviceConnection != null) {
             unbindService(serviceConnection);
+            mBound = false;
+            trackingService = null;
+        }
     }
 
     @Override
@@ -176,53 +171,8 @@ public class TrackingActivity extends FragmentActivity implements OnMapReadyCall
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-
-        // Add a marker in Sydney and move the camera
-        // LatLng sydney = new LatLng(-34, 151);
-        //   mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        //   mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
 
-
-    private boolean checkPermissions() {
-        return PackageManager.PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION);
-    }
-
-    private void requestPermissions() {
-        boolean shouldProvideRationale =
-                ActivityCompat.shouldShowRequestPermissionRationale(this,
-                        Manifest.permission.ACCESS_FINE_LOCATION);
-
-        // Provide an additional rationale to the user. This would happen if the user denied the
-        // request previously, but didn't check the "Don't ask again" checkbox.
-        if (shouldProvideRationale) {
-            //TODO: implement
-            /*Log.i(TAG, "Displaying permission rationale to provide additional context.");
-            Snackbar.make(
-                    findViewById(R.id.activity_main),
-                    R.string.permission_rationale,
-                    Snackbar.LENGTH_INDEFINITE)
-                    .setAction(R.string.ok, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            // Request permission
-                            ActivityCompat.requestPermissions(MainActivity.this,
-                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                    REQUEST_PERMISSIONS_REQUEST_CODE);
-                        }
-                    })
-                    .show();*/
-        } else {
-            Log.d(TAG, "Requesting permission");
-            // Request permission. It's possible this can be auto answered if device policy
-            // sets the permission in a given state or the user denied the permission
-            // previously and checked "Never ask again".
-            ActivityCompat.requestPermissions(TrackingActivity.this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    REQUEST_PERMISSIONS_REQUEST_CODE);
-        }
-    }
 
     /**
      * Callback received when a permissions request has been completed.
@@ -238,7 +188,7 @@ public class TrackingActivity extends FragmentActivity implements OnMapReadyCall
                 Log.d(TAG, "User interaction was cancelled.");
             } else if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission was granted.
-                trackingService.requestLocationUpdates();
+                trackingService.requestLocationUpdates(TrackingActivity.this);
 
             } else {
                 /*//TODO: implement
@@ -267,29 +217,11 @@ public class TrackingActivity extends FragmentActivity implements OnMapReadyCall
         }
     }
 
-    private class MyBroadcastReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-            Bundle bundle = intent.getExtras();
-            if (bundle.containsKey(CURRENT_LOCATION)) {
-                Location location = intent.getParcelableExtra(CURRENT_LOCATION);
-                if (location != null) {
-                    Log.d(TAG, "onReceive: " + location.getLatitude() + "  " + location.getLongitude());
-                    if (locationUpdatesRequested) {
-                        mPresenter.insertLocationUpdate(location, currentRideId);
-                        updateDistanceCovered(location);
-                    }
-                    setMarkers(location);
-                }
-            }
-        }
-    }
 
 
     //TODO: move this to the presenter
     private void updateDistanceCovered(Location location) {
-        if(currentLocationMarker != null){
+        if (currentLocationMarker != null) {
             Location previousLocation = new Location("");
             previousLocation.setLatitude(currentLocationMarker.getPosition().latitude);
             previousLocation.setLongitude(currentLocationMarker.getPosition().longitude);
@@ -297,42 +229,113 @@ public class TrackingActivity extends FragmentActivity implements OnMapReadyCall
         }
     }
 
+    @Override
+    public void onNewLocationReceived(Location location) {
+        if (location != null) {
+            Log.d(TAG, "onReceive: " + location.getLatitude() + "  " + location.getLongitude());
+            if (sharedPrefManager.isRideStarted()) {
+                mPresenter.insertLocationUpdate(location, currentRideId);
+                updateDistanceCovered(location);
+            }
+            setMarkers(location);
+        }
+    }
+
     private void setMarkers(Location location) {
 
-        if (locationUpdatesRequested) {
-            if (currentLocationMarker != null)
-                currentLocationMarker.remove();
+        if (sharedPrefManager.isRideStarted()) {
 
             LatLng coordinates = new LatLng(location.getLatitude(), location.getLongitude());
-            currentLocationMarker = mMap.addMarker(new MarkerOptions().position(coordinates).title("Current"));
+            if (currentLocationMarker != null)
+                currentLocationMarker.setPosition(coordinates);
+            else
+                currentLocationMarker = mMap.addMarker(new MarkerOptions().position(coordinates).title("Current"));
             mMap.moveCamera(CameraUpdateFactory.newLatLng(coordinates));
 
         } else {
             //TODO: get current zoom level of the map and use that value in every moveCameraCall
-            mMap.clear();
             LatLng coordinates = new LatLng(location.getLatitude(), location.getLongitude());
-            startLocationMarker = mMap.addMarker(new MarkerOptions()
-                    .position(coordinates)
-                    .title("Start")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+            if (startLocationMarker != null)
+                startLocationMarker.setPosition(coordinates);
+            else
+                startLocationMarker = mMap.addMarker(new MarkerOptions()
+                        .position(coordinates)
+                        .title("Start")
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+
+
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 14));
         }
+    }
+
+    private void startReceivingUpdates(){
+        if (!checkPermissions())
+            requestPermissions();
+        else
+            trackingService.requestLocationUpdates(TrackingActivity.this);
     }
 
     @Override
     public void onRideInserted(long insertedRowId) {
         currentRideId = insertedRowId;
-        locationUpdatesRequested = true;
-        if (!checkPermissions()) {
-            requestPermissions();
-        } else {
-            trackingService.requestLocationUpdates();
-        }
+        sharedPrefManager.setRideStarted(true);
+
+        setButtonState(StateSelector.RIDE_START);
+        setViewState(StateSelector.RIDE_START);
+
+        startReceivingUpdates();
 
     }
 
     @Override
+    public void onLocationUpdateInserted() {
+        String distanceToDisplay = String.format("%.2f", distanceCovered);
+        distanceCoveredTextView.setText(distanceToDisplay);
+    }
+
+    @Override
     public void onRideUpdated() {
-        locationUpdatesRequested = false;
+        setViewState(StateSelector.RIDE_STOP);
+        setButtonState(StateSelector.RIDE_STOP);
+        sharedPrefManager.setRideStarted(false);
+
+        Intent intent = new Intent(this, RideHistoryActivity.class);
+        startActivity(intent);
+    }
+
+    private void setButtonState(StateSelector state) {
+        switch(state){
+            case RIDE_START:
+                startTrackingButton.setVisibility(View.GONE);
+                stopTrackingButton.setVisibility(View.VISIBLE);
+                startTrackingButton.setEnabled(true);
+                break;
+
+            case RIDE_STOP:
+                stopTrackingButton.setVisibility(View.GONE);
+                startTrackingButton.setVisibility(View.VISIBLE);
+                stopTrackingButton.setEnabled(true);
+                break;
+
+            case DEFAULT:
+        }
+    }
+
+    private void setViewState(StateSelector state) {
+        switch(state){
+            case RIDE_START:
+                timerTextView.setVisibility(View.VISIBLE);
+                distanceCoveredTextView.setVisibility(View.VISIBLE);
+                break;
+
+            case RIDE_STOP:
+                timerTextView.setVisibility(View.GONE);
+                distanceCoveredTextView.setVisibility(View.GONE);
+                distanceCovered = 0;
+                mMap.clear();
+                currentLocationMarker = null;
+                startLocationMarker = null;
+                break;
+        }
     }
 }

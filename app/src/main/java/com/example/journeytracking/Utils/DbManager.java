@@ -1,13 +1,10 @@
 package com.example.journeytracking.Utils;
 
-import android.os.AsyncTask;
+import com.example.journeytracking.Data.RideDatabase;
+import com.example.journeytracking.Data.RideDetails;
+import com.example.journeytracking.Data.RideLocationUpdates;
 
-import com.example.journeytracking.AppController;
-import com.example.journeytracking.Data.RoomDb.RideDatabase;
-import com.example.journeytracking.Data.RoomDb.RideDetails;
-import com.example.journeytracking.Data.RoomDb.RideLocationUpdates;
-
-import java.lang.ref.WeakReference;
+import static com.example.journeytracking.Utils.CONSTANTS.QuerySelector.*;
 
 public class DbManager {
 
@@ -18,24 +15,31 @@ public class DbManager {
     }
 
     public void insertRideDetails(RideDetails rideDetails, DbOperationCallback dbOperationCallback) {
-        InsertRideDetailsAsyncTask asyncTask = new InsertRideDetailsAsyncTask(dbOperationCallback);
-        asyncTask.execute(new RideDetails[] {rideDetails});
+
+        DbQueryExecutor executor  = new DbQueryExecutor<RideDetails>(db, dbOperationCallback, INSERT_RIDE);
+        executor.execute(rideDetails);
+        /*InsertRideDetailsAsyncTask asyncTask = new InsertRideDetailsAsyncTask(dbOperationCallback);
+        asyncTask.execute(new RideDetails[] {rideDetails});*/
     }
 
     public void insertLocationUpdates(RideLocationUpdates locationUpdates, DbOperationCallback dbOperationCallback) {
-       InsertLocationUpdatesAsyncTask asyncTask = new InsertLocationUpdatesAsyncTask(dbOperationCallback);
-       asyncTask.execute(new RideLocationUpdates[] {locationUpdates});
+        DbQueryExecutor executor  = new DbQueryExecutor<RideLocationUpdates>(db, dbOperationCallback, INSERT_LOCATION_UPDATE);
+        executor.execute(locationUpdates);
+       /*InsertLocationUpdatesAsyncTask asyncTask = new InsertLocationUpdatesAsyncTask(dbOperationCallback);
+       asyncTask.execute(new RideLocationUpdates[] {locationUpdates});*/
     }
 
     public void updateRideDetails(RideDetails rideDetails, DbOperationCallback dbOperationCallback) {
-        UpdateRideDetailsAsyncTask asyncTask = new UpdateRideDetailsAsyncTask(dbOperationCallback);
-        asyncTask.execute(new RideDetails[] {rideDetails});
+        DbQueryExecutor executor  = new DbQueryExecutor<RideDetails>(db, dbOperationCallback, UPDATE_RIDE);
+        executor.execute(rideDetails);
+        /*UpdateRideDetailsAsyncTask asyncTask = new UpdateRideDetailsAsyncTask(dbOperationCallback);
+        asyncTask.execute(new RideDetails[] {rideDetails});*/
     }
 
 
 
 
-    private class InsertRideDetailsAsyncTask extends AsyncTask<RideDetails, Void, Long> {
+   /* private class InsertRideDetailsAsyncTask extends AsyncTask<RideDetails, Void, Long> {
         private WeakReference<DbOperationCallback> dbOperationCallback;
 
         public InsertRideDetailsAsyncTask(DbOperationCallback dbOperationCallback) {
@@ -104,7 +108,7 @@ public class DbManager {
             if (dbOperationCallback != null)
                 dbOperationCallback.onUpdateRide();
         }
-    }
+    }*/
 
     public interface DbOperationCallback {
         void onInsertRide(long insertedRowId);

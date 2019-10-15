@@ -1,4 +1,4 @@
-package com.example.journeytracking.Data.RoomDb;
+package com.example.journeytracking.Data;
 
 import androidx.room.Dao;
 import androidx.room.Delete;
@@ -18,8 +18,8 @@ public interface RideLocationUpdatesDao {
     long insertRideLocationUpdates(RideLocationUpdates rideLocationUpdates);
 
     @Update
-    void updateRideLocationUpdates(RideLocationUpdates rideLocationUpdates);
+    int updateRideLocationUpdates(RideLocationUpdates rideLocationUpdates);
 
     @Delete
-    void deleteRideLocationUpdates(RideLocationUpdates rideLocationUpdates);
+    int deleteRideLocationUpdates(RideLocationUpdates rideLocationUpdates);
 }

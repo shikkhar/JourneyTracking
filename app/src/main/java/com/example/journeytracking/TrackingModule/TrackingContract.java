@@ -9,10 +9,11 @@ public interface TrackingContract {
     interface Presenter{
         void insertNewRide(LatLng startLocation);
         void insertLocationUpdate(Location currentLocation, long rideId);
-        void updateCurrentRide(LatLng endLocation, double distanceCovered, long rideId);
+        void updateCurrentRide(LatLng endLocation, double distanceCovered, boolean isRideComplete, long rideId);
     }
     interface View{
         void onRideInserted(long insertedRowId);
+        void onLocationUpdateInserted();
         void onRideUpdated();
     }
 }

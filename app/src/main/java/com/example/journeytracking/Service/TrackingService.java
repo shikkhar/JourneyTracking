@@ -1,37 +1,30 @@
-package com.example.journeytracking.TrackingModule;
+package com.example.journeytracking.Service;
 
-import android.app.ActivityManager;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Binder;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.core.app.NotificationCompat;
 
+import com.example.journeytracking.R;
+import com.example.journeytracking.TrackingModule.TrackingActivity;
 import com.example.journeytracking.Utils.AppLocationManager;
+import com.example.journeytracking.Utils.CONSTANTS;
+import com.example.journeytracking.Utils.SharedPrefManager;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 
+
 public class TrackingService extends Service {
     private static final String TAG = "TrackingService";
-
-    private static final String PACKAGE_NAME =
-            "com.google.android.gms.location.sample.locationupdatesforegroundservice";
-    static final String ACTION_BROADCAST = PACKAGE_NAME + ".broadcast";
-    static final String CURRENT_LOCATION = PACKAGE_NAME + ".current_location";
-    static final String END_LOCATION = PACKAGE_NAME + ".end_location";
-
-   // private static final String EXTRA_STARTED_FROM_NOTIFICATION = PACKAGE_NAME +
-    //        ".started_from_notification";
-
-
-    private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10*1000;
-
+    public static final int NOTIFICATION_ID = 123;
+    private static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10 * 1000;
     private static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
             UPDATE_INTERVAL_IN_MILLISECONDS / 2;
 
@@ -39,7 +32,8 @@ public class TrackingService extends Service {
     private LocationRequest locationRequest;
     private CurrentLocationCallback locationCallback;
     private AppLocationManager appLocationManager;
-    private Handler serviceHandler;
+    private SharedPrefManager sharedPrefManager;
+    private NewLocationCallback newLocationCallback;
 
     public TrackingService() {
     }
@@ -51,10 +45,8 @@ public class TrackingService extends Service {
         createLocationRequest();
         locationCallback = new CurrentLocationCallback();
         appLocationManager = new AppLocationManager(this);
-/*
-        HandlerThread handlerThread = new HandlerThread(TAG);
-        handlerThread.start();
-        serviceHandler = new Handler(handlerThread.getLooper());*/
+        sharedPrefManager = new SharedPrefManager(getApplicationContext());
+
     }
 
     private void createLocationRequest() {
@@ -75,38 +67,45 @@ public class TrackingService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-       return binder;
+        stopForeground(true);
+        return binder;
     }
 
     @Override
     public void onRebind(Intent intent) {
+        stopForeground(true);
         super.onRebind(intent);
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
-        return super.onUnbind(intent);
+        if (sharedPrefManager.isRideStarted())
+            startForeground(NOTIFICATION_ID, getNotification());
+        else
+            stopSelf();
+        return true;
     }
 
 
-    void requestLocationUpdates(){
+    public void requestLocationUpdates(NewLocationCallback newLocationCallback) {
+        this.newLocationCallback = newLocationCallback;
         Intent serviceIntent = new Intent(getApplicationContext(), TrackingService.class);
         startService(serviceIntent);
     }
 
-    void removeLocationUpdates(){
+    public void removeLocationUpdates() {
         appLocationManager.removeLocationUpdates(locationCallback);
         stopSelf();
 
     }
 
-    public class LocalBinder extends Binder{
-        TrackingService getService(){
+    public class LocalBinder extends Binder {
+        public TrackingService getService() {
             return TrackingService.this;
         }
     }
 
-    private class CurrentLocationCallback extends LocationCallback{
+    private class CurrentLocationCallback extends LocationCallback {
         @Override
         public void onLocationResult(LocationResult locationResult) {
             super.onLocationResult(locationResult);
@@ -119,15 +118,31 @@ public class TrackingService extends Service {
 
     private void onNewLocationReceived(Location location) {
 
-        if(!serviceIsRunningInForeground(TrackingService.this)) {
-            Intent intent = new Intent(ACTION_BROADCAST);
-            intent.putExtra(CURRENT_LOCATION, location);
-            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-        }
+        newLocationCallback.onNewLocationReceived(location);
+
     }
 
 
-    public boolean serviceIsRunningInForeground(Context context) {
+    private Notification getNotification() {
+
+
+        // The PendingIntent to launch activity.
+        PendingIntent activityPendingIntent = PendingIntent.getActivity(this, 0,
+                new Intent(this, TrackingActivity.class), 0);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CONSTANTS.Notification.CHANNEL_ID)
+                .setContentText(getString(R.string.notification_text))
+                .setContentTitle(getString(R.string.app_name))
+                .setOngoing(true)
+                .setPriority(Notification.PRIORITY_HIGH)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setWhen(System.currentTimeMillis())
+                .setContentIntent(activityPendingIntent);
+        return builder.build();
+    }
+
+
+    /*public boolean serviceIsRunningInForeground(Context context) {
         ActivityManager manager = (ActivityManager) context.getSystemService(
                 Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(
@@ -139,5 +154,9 @@ public class TrackingService extends Service {
             }
         }
         return false;
+    }*/
+
+    public interface NewLocationCallback{
+        void onNewLocationReceived(Location location);
     }
 }

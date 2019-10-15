@@ -5,8 +5,8 @@ import android.location.Location;
 
 import androidx.annotation.NonNull;
 
-import com.example.journeytracking.Data.RoomDb.RideDetails;
-import com.example.journeytracking.Data.RoomDb.RideLocationUpdates;
+import com.example.journeytracking.Data.RideDetails;
+import com.example.journeytracking.Data.RideLocationUpdates;
 import com.example.journeytracking.Utils.DbManager;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -25,7 +25,7 @@ public class TrackingPresenter implements TrackingContract.Presenter {
 
     @Override
     public void insertNewRide(LatLng startLocation) {
-        RideDetails rideDetails = new RideDetails(startLocation.latitude, startLocation.longitude);
+        RideDetails rideDetails = new RideDetails(startLocation.latitude, startLocation.longitude, false);
         dbManager.insertRideDetails(rideDetails, new DbOperationCallbackImpl(mView));
     }
 
@@ -36,8 +36,8 @@ public class TrackingPresenter implements TrackingContract.Presenter {
     }
 
     @Override
-    public void updateCurrentRide(LatLng endLocation, double distanceCovered, long rideId) {
-        RideDetails rideDetails = new RideDetails(endLocation.latitude, endLocation.longitude, distanceCovered, rideId);
+    public void updateCurrentRide(LatLng endLocation, double distanceCovered, boolean isRideComplete, long rideId) {
+        RideDetails rideDetails = new RideDetails(endLocation.latitude, endLocation.longitude, distanceCovered, isRideComplete, rideId );
         dbManager.updateRideDetails(rideDetails, new DbOperationCallbackImpl(mView));
     }
 
@@ -60,7 +60,7 @@ public class TrackingPresenter implements TrackingContract.Presenter {
         public void onInsertLocationUpdate(long insertedRowId) {
             TrackingContract.View view = mView.get();
             if(view != null){
-                //view.onRideInserted(insertedRowId);
+               view.onLocationUpdateInserted();
             }
         }
 

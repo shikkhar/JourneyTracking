@@ -1,4 +1,4 @@
-package com.example.journeytracking.Data.RoomDb;
+package com.example.journeytracking.Data;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
@@ -21,8 +21,10 @@ public class RideDetails {
 
     public double distanceCovered;
 
+    public boolean isRideComplete;
+
     @Ignore
-    public RideDetails(double endLatitude, double endLongitude, double distanceCovered, long rideId) {
+    public RideDetails(double endLatitude, double endLongitude, double distanceCovered, boolean isRideComplete,  long rideId) {
 
         this.endLatitude = endLatitude;
         this.endLongitude = endLongitude;
@@ -30,8 +32,9 @@ public class RideDetails {
         this.id = rideId;
     }
 
-    public RideDetails(double startLatitude, double startLongitude) {
+    public RideDetails(double startLatitude, double startLongitude, boolean isRideComplete) {
         this.startLatitude = startLatitude;
         this.startLongitude = startLongitude;
+        this.isRideComplete = isRideComplete;
     }
 }

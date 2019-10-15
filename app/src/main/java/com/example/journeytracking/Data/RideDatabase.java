@@ -1,4 +1,4 @@
-package com.example.journeytracking.Data.RoomDb;
+package com.example.journeytracking.Data;
 
 import androidx.room.Database;
 import androidx.room.RoomDatabase;

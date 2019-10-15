@@ -1,4 +1,4 @@
-package com.example.journeytracking.Data.RoomDb;
+package com.example.journeytracking.Data;
 
 import androidx.room.Entity;
 import androidx.room.ForeignKey;

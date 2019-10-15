@@ -1,10 +1,9 @@
-package com.example.journeytracking.Data.RoomDb;
+package com.example.journeytracking.Data;
 
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
-import androidx.room.Update;
 
 import java.util.List;
 
@@ -20,10 +19,11 @@ public interface RideDetailsDao {
     @Query("Update ride_details " +
             "SET endLatitude = :endLocationLatitude, " +
             "endLongitude = :endLocationLongitude, " +
-            "distanceCovered = :distanceCovered " +
+            "distanceCovered = :distanceCovered, " +
+            "isRideComplete = :isRideComplete " +
             "WHERE id = :rideId")
-    void updateRideDetails(double endLocationLatitude, double endLocationLongitude, double distanceCovered, long rideId);
+    int updateRideDetails(double endLocationLatitude, double endLocationLongitude, double distanceCovered, boolean isRideComplete, long rideId);
 
     @Delete
-    void deleteRideDetails(RideDetails rideDetails);
+    int deleteRideDetails(RideDetails rideDetails);
 }
