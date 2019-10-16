@@ -13,7 +13,7 @@ import com.example.journeytracking.Data.RideDatabase;
 import com.example.journeytracking.Utils.CONSTANTS;
 
 /**
- * Subclass of our Application calss
+ * Subclass of our Application class
  * Used to create the notification channel
  * and singleton instance of room db, volley request queue
  */
@@ -22,7 +22,7 @@ public class AppController extends Application {
     private RequestQueue mRequestQueue;
     private  RideDatabase db;
     private static AppController mInstance;
-    public  final String DB_NAME = "rideDatabase";
+    private final String DB_NAME = "rideDatabase";
 
     @Override
     public void onCreate() {

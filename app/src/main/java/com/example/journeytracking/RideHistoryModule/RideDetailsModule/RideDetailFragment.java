@@ -107,7 +107,7 @@ public class RideDetailFragment extends Fragment implements RideDetailContract.V
         mPresenter.snapToRoad(rideLocationUpdatesList, getString(R.string.google_maps_key));
     }
 
-    //we can only send upto a 100 points in a request to the roads API
+    //we can only send up to a 100 points in a request to the roads API
     //therefore the requests are broken down
     //and the results are then tied together to give the final static image
     @Override

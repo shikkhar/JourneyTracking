@@ -20,7 +20,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".RideHistoryModule.RideHistoryActivity" />
+        <activity android:name=".RideHistoryModule.RideHistoryActivity"
+            android:screenOrientation="portrait"/>
 
         <service
             android:name=".Service.TrackingService"
@@ -43,8 +44,11 @@
 
         <activity
             android:name=".TrackingModule.TrackingActivity"
-            android:label="@string/title_activity_tracking" />
-        <activity android:name=".MainModule.MainActivity">
+            android:launchMode="singleTask"
+            android:label="@string/title_activity_tracking"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".MainModule.MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

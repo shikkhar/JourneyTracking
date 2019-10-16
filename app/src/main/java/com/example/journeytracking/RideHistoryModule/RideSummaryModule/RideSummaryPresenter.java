@@ -36,7 +36,7 @@ public class RideSummaryPresenter implements RideSummaryContract.Presenter {
         //Weak reference to avoid memory leaks
         private WeakReference<RideSummaryContract.View> mView;
 
-        public DbOperationCallbackImpl(RideSummaryContract.View view) {
+         DbOperationCallbackImpl(RideSummaryContract.View view) {
             this.mView = new WeakReference<>(view);
         }
 

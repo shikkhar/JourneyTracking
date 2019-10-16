@@ -18,7 +18,7 @@ import static com.example.journeytracking.Utils.CONSTANTS.QuerySelector.*;
  * @param <S> is the type of the input argument
  * @param <T> is the type of the output argument
  */
-public class DbQueryExecutor<S, T> extends AsyncTask<S, Void, T> {
+class DbQueryExecutor<S, T> extends AsyncTask<S, Void, T> {
 
     private RideDatabase db;
     //weak reference to our db operation callback object
@@ -49,7 +49,7 @@ public class DbQueryExecutor<S, T> extends AsyncTask<S, Void, T> {
         return null;
     }
 
-    //initiate callback on receiveing the results
+    //initiate callback on receiving the results
     @Override
     protected void onPostExecute(T value) {
         initiateCallback(value);
@@ -85,7 +85,7 @@ public class DbQueryExecutor<S, T> extends AsyncTask<S, Void, T> {
     }
 
     //initiate callbacks based on the type of query
-    private void initiateCallback(T value) {
+    private void initiateCallback(T value) throws ClassCastException {
         DbManager.DbOperationCallback dbOperationCallback = this.dbOperationCallback.get();
         if (dbOperationCallback != null) {
 

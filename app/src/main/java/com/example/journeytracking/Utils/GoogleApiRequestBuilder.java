@@ -2,7 +2,6 @@ package com.example.journeytracking.Utils;
 
 import com.example.journeytracking.Data.RideDetails;
 import com.example.journeytracking.Data.RideLocationUpdates;
-import com.example.journeytracking.R;
 
 import java.util.ArrayList;
 
@@ -11,8 +10,8 @@ import java.util.ArrayList;
  */
 
 public class GoogleApiRequestBuilder {
-    public static final String ROADS_API_ENDPOINT = "https://roads.googleapis.com/v1/snapToRoads?path=";
-    public static final String STATIC_MAP_API_ENDPOINT = "https://maps.googleapis.com/maps/api/staticmap?";
+    private static final String ROADS_API_ENDPOINT = "https://roads.googleapis.com/v1/snapToRoads?path=";
+    private static final String STATIC_MAP_API_ENDPOINT = "https://maps.googleapis.com/maps/api/staticmap?";
 
     //Request Builder for Snap to Road
     public static ArrayList<String> snapToRoadRequestBuilder(ArrayList<RideLocationUpdates> rideLocationUpdatesList, String apiKey){
@@ -23,24 +22,23 @@ public class GoogleApiRequestBuilder {
         //we have to break down the requests
         int size = rideLocationUpdatesList.size();
         //number of requests needed based on location
-        int numberOfRequests = size/100;
-
-        if(size >= 100)
-            numberOfRequests--;
-
+        int numberOfRequests = (int) Math.ceil(size/100.00);
 
         String interpolate = "&interpolate=true";
 
+        int k = 0;
         //build the url
-        for(int i=0; i<=numberOfRequests; i++){
-            for(int j=i*100; j<(i+1)*99 && j<size-1; j++){
+        for(int i=0; i<numberOfRequests; i++){
+            path.setLength(0);
+            for(int j=i*100; j<((i+1)*100-1) && j<size-1; j++){
                 path.append(rideLocationUpdatesList.get(j).latitude).append(",")
                         .append(rideLocationUpdatesList.get(j).longitude).append("|");
             }
 
             int position = size - 1;
             if((i+1)*99 < size)
-                position = (i=1) *99;
+                position = (i+1) *99;
+
             path.append(rideLocationUpdatesList.get(position).latitude)
                     .append(",")
                     .append(rideLocationUpdatesList.get(position).longitude)
@@ -52,7 +50,7 @@ public class GoogleApiRequestBuilder {
         }
 
         //return list of requests
-        //number of items in this list = number of resposnes expected from the server
+        //number of items in this list = number of responses expected from the server
         return requestUrls;
 
     }
@@ -62,15 +60,13 @@ public class GoogleApiRequestBuilder {
                                                  ArrayList<RideLocationUpdates> snappedLocationUpdates, String api){
 
         String size = "size=" + imageWidth + "x" + imageHeight;
-        String startMarker = "&markers=size:mid|color:green|" + rideDetails.startLatitude +"," + rideDetails.startLongitude;
-        String endMarker = "&markers=size:small|color:red|" + rideDetails.endLatitude +"," + rideDetails.endLongitude;
+        String startMarker = "&markers=size:small|color:green|" + rideDetails.startLatitude +"," + rideDetails.startLongitude;
+        String endMarker = "&markers=size:mid|color:red|" + rideDetails.endLatitude +"," + rideDetails.endLongitude;
 
 
         String path = "&path=color:blue|weight:5|geodesic:true" + stringBuilder(snappedLocationUpdates);
 
-        String request = STATIC_MAP_API_ENDPOINT + size  + startMarker + endMarker + path + "&key=" + api;
-
-        return request;
+        return STATIC_MAP_API_ENDPOINT + size  + startMarker + endMarker + path + "&key=" + api;
     }
 
     public static String staticMapMarkersRequest(RideDetails rideDetails, String api) {
@@ -78,9 +74,8 @@ public class GoogleApiRequestBuilder {
         String scale = "&scale=2";
         String startMarker = "&markers=size:tiny|color:green|" + rideDetails.startLatitude +"," + rideDetails.startLongitude;
         String endMarker = "&markers=size:mid|color:red|" + rideDetails.endLatitude +"," + rideDetails.endLongitude;
-        String request = STATIC_MAP_API_ENDPOINT +size+scale+startMarker+endMarker+"&key="+api;
 
-        return request;
+        return STATIC_MAP_API_ENDPOINT +size+scale+startMarker+endMarker+"&key="+api;
     }
 
     private static String stringBuilder(ArrayList<RideLocationUpdates> snappedPointsList){

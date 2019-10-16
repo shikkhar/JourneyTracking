@@ -1,8 +1,6 @@
 package com.example.journeytracking.TrackingModule;
 
 import android.location.Location;
-
-import com.example.journeytracking.Utils.AppLocationManager;
 import com.google.android.gms.maps.model.LatLng;
 
 public interface TrackingContract {

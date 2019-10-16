@@ -1,7 +1,6 @@
 package com.example.journeytracking.Utils;
 
 import android.content.Context;
-import android.os.Build;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
@@ -27,11 +26,13 @@ public class Utils {
 
     public static String getTime(String dateTimeString) throws ParseException {
         Date date = new SimpleDateFormat("dd-M-yyyy hh:mm:ss").parse(dateTimeString);
+        assert date != null;
         return new SimpleDateFormat("H:mm a").format(date);
     }
 
     public static String getDate(String dateTimeString) throws ParseException{
         Date date = new SimpleDateFormat("dd-M-yyyy hh:mm:ss").parse(dateTimeString);
+        assert date != null;
         return new SimpleDateFormat("dd-M-yyyy").format(date);
     }
     public static String getTimeFromMillis(long d) {

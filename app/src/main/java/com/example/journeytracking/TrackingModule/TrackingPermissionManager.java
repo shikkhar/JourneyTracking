@@ -4,13 +4,9 @@ import android.Manifest;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.util.Log;
-import android.view.View;
-
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
-
-import com.example.journeytracking.R;
 import com.example.journeytracking.Utils.CONSTANTS;
 import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.LocationRequest;
@@ -21,7 +17,6 @@ import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.snackbar.Snackbar;
 
 /**
  *
@@ -36,13 +31,13 @@ public class TrackingPermissionManager extends FragmentActivity {
     private static final String TAG = "PermissionManager";
 
     //check for runtime permissions
-    protected boolean checkPermissions() {
+     boolean checkPermissions() {
         return PackageManager.PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION);
     }
 
-    //if we dont have the permission this method is used to request them
-    protected void requestPermissions() {
+    //if we don't have the permission this method is used to request them
+     void requestPermissions() {
 
             Log.d(TAG, "Requesting permission");
             // Request permission. It's possible this can be auto answered if device policy
@@ -54,7 +49,7 @@ public class TrackingPermissionManager extends FragmentActivity {
     }
 
     //function to check if location settings are disabled or not
-    protected void checkLocationSettings() {
+     void checkLocationSettings() {
 
         //broadcast receiver for connectivity change getting triggered multiple time for a single switch
         //using a static static variable here to ensure that the settings are checked only once and not multiple times
@@ -69,7 +64,7 @@ public class TrackingPermissionManager extends FragmentActivity {
             SettingsClient client = LocationServices.getSettingsClient(this);
             //checking location setting returns a task which we can check later by attaching listeners to it
             Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
-            //this is called if the settings are upto our requirement
+            //this is called if the settings are up to our requirement
             task.addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
                 @Override
                 public void onSuccess(LocationSettingsResponse locationSettingsResponse) {

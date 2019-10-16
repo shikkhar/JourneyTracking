@@ -83,14 +83,14 @@ public class TrackingService extends Service {
         sharedPrefManager = new SharedPrefManager(getApplicationContext());
         gpsLocationReceiver = new GpsLocationReceiver();
 
-        //Broadcast receier is registered here and unregistered in onDestroy()
+        //Broadcast receiver is registered here and unregistered in onDestroy()
         //It is tied to the lifecycle of the service because if the service is running it means that the user wants location
         // updates from the service, therefore it's necessary to have appropriate location settings
         registerReceiver(gpsLocationReceiver, new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION));
 
     }
 
-    //create the request based on whcih location updates will be provided
+    //create the request based on which location updates will be provided
     private void createLocationRequest() {
         locationRequest = new LocationRequest();
         //minimum interval between two requests..this is not fixed
@@ -147,6 +147,7 @@ public class TrackingService extends Service {
     //function to stop receiving location updates
     //since we don't need updates stop the service
     public void removeLocationUpdates() {
+        this.trackingActivityCallback = null;
         appLocationManager.removeLocationUpdates(locationCallback);
         stopSelf();
     }
@@ -184,8 +185,12 @@ public class TrackingService extends Service {
     //Notification builder for the foreground notifications
     private Notification getNotification() {
         // The PendingIntent to launch activity.
+
+        Intent intent =  new Intent(this, TrackingActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
         PendingIntent activityPendingIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, TrackingActivity.class), 0);
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CONSTANTS.Notification.CHANNEL_ID)
                 .setContentText(getString(R.string.notification_text))
@@ -205,4 +210,6 @@ public class TrackingService extends Service {
         void onNewLocationReceived(Location location);
         void checkGpsSettings();
     }
+
+
 }

@@ -5,13 +5,13 @@ package com.example.journeytracking.Utils;
  */
 public class ApiRequestManager {
 
-    //Get Request to recive snap to road locations
-    public static void snapToRoad(String url, String requestTag, VolleySeverRequest.VolleyResponseCallback volleyResponseCallback){
+    //Get Request to receive snap to road locations
+    public  void snapToRoad(String url, String requestTag, VolleySeverRequest.VolleyResponseCallback volleyResponseCallback){
         VolleySeverRequest severRequest = new VolleySeverRequest(volleyResponseCallback);
         severRequest.makeGetRequest(url,requestTag);
     }
 
-    public static void cancelAll(String requestTag){
+    public  void cancelAll(String requestTag){
         VolleySeverRequest severRequest = new VolleySeverRequest();
         severRequest.cancelRequest(requestTag);
     }

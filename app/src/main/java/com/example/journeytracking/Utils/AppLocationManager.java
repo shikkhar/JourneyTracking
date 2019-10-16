@@ -1,18 +1,11 @@
 package com.example.journeytracking.Utils;
 
 import android.content.Context;
-import android.location.Location;
 import android.os.Looper;
-import android.util.Log;
-
-import androidx.annotation.NonNull;
-
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.Task;
+
 
 /**
  * This class provides location updates based on the location request object

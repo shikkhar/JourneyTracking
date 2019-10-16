@@ -4,7 +4,7 @@ import com.example.journeytracking.Data.RideDetails;
 
 import java.util.ArrayList;
 
-public class RideSummaryContract {
+public interface RideSummaryContract {
     interface Presenter{
         void getRideDetailsList();
         void onDetach();

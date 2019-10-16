@@ -40,24 +40,24 @@ import com.google.android.material.snackbar.Snackbar;
 
 /**
  * This app uses a long-running bound and started service for location updates. The service is
- *  * aware of foreground status of this activity, which is the only bound client in
- *  * this sample. After requesting location updates, when the activity ceases to be in the foreground,
- *  * the service promotes itself to a foreground service and continues receiving location updates.
- *  * When the activity comes back to the foreground, the foreground service stops, and the
- *  * notification associated with that foreground service is removed.
- *  *
- *  * While the foreground service notification is displayed, the user has the option to launch the
- *  * activity from the notification.
- *
- *  Note: Users have three options regarding location:
- *  * <ul>
- *  *     <li>Allow all the time</li>
- *  *     <li>Allow while app is in use, i.e., while app is in foreground</li>
- *  *     <li>Not allow location at all</li>
- *  * </ul>
- *  * Because this app creates a foreground service (tied to a Notification) when the user navigates
- *  * away from the app, it only needs location "while in use." That is, there is no need to ask for
- *  * location all the time (which requires additional permissions in the manifest).
+ * * aware of foreground status of this activity, which is the only bound client in
+ * * this sample. After requesting location updates, when the activity ceases to be in the foreground,
+ * * the service promotes itself to a foreground service and continues receiving location updates.
+ * * When the activity comes back to the foreground, the foreground service stops, and the
+ * * notification associated with that foreground service is removed.
+ * *
+ * * While the foreground service notification is displayed, the user has the option to launch the
+ * * activity from the notification.
+ * <p>
+ * Note: Users have three options regarding location:
+ * * <ul>
+ * *     <li>Allow all the time</li>
+ * *     <li>Allow while app is in use, i.e., while app is in foreground</li>
+ * *     <li>Not allow location at all</li>
+ * * </ul>
+ * * Because this app creates a foreground service (tied to a Notification) when the user navigates
+ * * away from the app, it only needs location "while in use." That is, there is no need to ask for
+ * * location all the time (which requires additional permissions in the manifest).
  */
 
 public class TrackingActivity extends TrackingPermissionManager implements OnMapReadyCallback,
@@ -91,7 +91,7 @@ public class TrackingActivity extends TrackingPermissionManager implements OnMap
     private TextView timerTextView;
     private Group timeDistanceGroup;
 
-    //MArkers to be displayed on the map
+    //Markers to be displayed on the map
     private Marker startLocationMarker;
     private Marker currentLocationMarker;
 
@@ -138,7 +138,7 @@ public class TrackingActivity extends TrackingPermissionManager implements OnMap
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             try {
-               //get the instance of the service from the binder object
+                //get the instance of the service from the binder object
                 trackingService = ((TrackingService.LocalBinder) service).getService();
             } catch (ClassCastException e) {
                 e.printStackTrace();
@@ -182,14 +182,25 @@ public class TrackingActivity extends TrackingPermissionManager implements OnMap
     }
 
     @Override
+    public void onBackPressed() {
+        if (sharedPrefManager.isRideStarted())
+            moveTaskToBack(true);
+        else
+            super.onBackPressed();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         //remove the reference to the activity from the presenter
         //in case some object has a weak reference to the activity, then it wont be able to access it
         mPresenter.onDetach();
+        if (trackingService != null) {
+            trackingService.removeLocationUpdates();
+        }
     }
 
-    //callback function for when map is ready to be manipualted
+    //callback function for when map is ready to be manipulated
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -203,11 +214,11 @@ public class TrackingActivity extends TrackingPermissionManager implements OnMap
         public void onClick(View v) {
             //once a ride is started it has to be replaced by the stop button
             //stop button is displayed once the database has been updated
-            startTrackingButton.setEnabled(false);
 
-            //if we have received a starting location put it into the databse as our start location
+            //if we have received a starting location put it into the database as our start location
             //in case we haven't been receiving locations the start location marker will be null and the ride wont start
             if (startLocationMarker != null) {
+                startTrackingButton.setEnabled(false);
                 mPresenter.insertNewRide(startLocationMarker.getPosition(), false, Utils.getDateTime());
                 trackingService.removeLocationUpdates();
             } else {
@@ -253,7 +264,6 @@ public class TrackingActivity extends TrackingPermissionManager implements OnMap
 
     /**
      * Presenter Callback Methods
-     *
      */
 
     //callback method from the presenter
@@ -329,8 +339,7 @@ public class TrackingActivity extends TrackingPermissionManager implements OnMap
     }
 
 
-
-    //for each new location increment the distance covered by the distance between the old and new lcoation
+    //for each new location increment the distance covered by the distance between the old and new location
     private void updateDistanceCovered(Location location) {
         if (currentLocationMarker != null) {
             Location previousLocation = new Location("");
@@ -347,7 +356,7 @@ public class TrackingActivity extends TrackingPermissionManager implements OnMap
         //if a ride is in progress update the current marker but do not change the start marker
         if (sharedPrefManager.isRideStarted()) {
             LatLng coordinates = new LatLng(location.getLatitude(), location.getLongitude());
-            //check if we are receiving the locationfor the first time or not
+            //check if we are receiving the location for the first time or not
             if (currentLocationMarker != null)
                 currentLocationMarker.setPosition(coordinates);
             else
@@ -356,7 +365,7 @@ public class TrackingActivity extends TrackingPermissionManager implements OnMap
 
         } else {
             LatLng coordinates = new LatLng(location.getLatitude(), location.getLongitude());
-            //check if we are receiving the locationfor the first time or not
+            //check if we are receiving the location for the first time or not
             if (startLocationMarker != null) {
                 startLocationMarker.setPosition(coordinates);
                 mMap.animateCamera(CameraUpdateFactory.newLatLng(coordinates));
@@ -364,7 +373,7 @@ public class TrackingActivity extends TrackingPermissionManager implements OnMap
                 startLocationMarker = mMap.addMarker(new MarkerOptions()
                         .position(coordinates)
                         .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 16));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(coordinates, 17));
             }
 
 

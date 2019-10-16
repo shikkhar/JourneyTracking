@@ -1,6 +1,6 @@
 package com.example.journeytracking.RideHistoryModule;
 
-public class RideHistoryContract {
+public interface RideHistoryContract {
     interface Presenter{}
     interface View{}
 }

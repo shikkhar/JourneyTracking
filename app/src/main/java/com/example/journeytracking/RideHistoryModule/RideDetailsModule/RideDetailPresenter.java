@@ -1,5 +1,7 @@
 package com.example.journeytracking.RideHistoryModule.RideDetailsModule;
 
+import android.os.SystemClock;
+
 import com.android.volley.VolleyError;
 import com.example.journeytracking.Data.RideDetails;
 import com.example.journeytracking.Data.RideLocationUpdates;
@@ -24,10 +26,6 @@ public class RideDetailPresenter implements RideDetailContract.Presenter {
     private DbManager dbManager;
     //api manager to send get requests using volley
     private ApiRequestManager apiRequestManager;
-    //since a request to the road API can only contain 100 locations
-    //it is broken down into separate requests
-    //this fields helps to keep count of number of responses we are expecting
-    private int numberOfResponses = 0;
 
     public RideDetailPresenter(RideDetailContract.View mView, DbManager dbManager, ApiRequestManager apiRequestManager) {
         this.mView = mView;
@@ -49,9 +47,13 @@ public class RideDetailPresenter implements RideDetailContract.Presenter {
         //it is broken down into separate requests
         ArrayList<String> urls = GoogleApiRequestBuilder.snapToRoadRequestBuilder(rideLocationUpdatesList, apiKey);
         //number of expected responses = number of requests made
-        numberOfResponses = urls.size();
+        //since a request to the road API can only contain 100 locations
+        //it is broken down into separate requests
+        //this fields helps to keep count of number of responses we are expecting
+        int numberOfResponses = urls.size();
         for (String url : urls) {
             apiRequestManager.snapToRoad(url, SNAP_TO_ROAD, new VolleyRequestCallbackImpl(mView, numberOfResponses));
+            SystemClock.sleep(700);
         }
     }
 
@@ -71,7 +73,7 @@ public class RideDetailPresenter implements RideDetailContract.Presenter {
         //number of responses received
         private static int actualNumberOfResponses = 0;
 
-        public VolleyRequestCallbackImpl(RideDetailContract.View view, int expectedNumberOfResponses) {
+         VolleyRequestCallbackImpl(RideDetailContract.View view, int expectedNumberOfResponses) {
             this.mView = new WeakReference<>(view);
             this.expectedNumberOfResponses = expectedNumberOfResponses;
         }
@@ -84,8 +86,8 @@ public class RideDetailPresenter implements RideDetailContract.Presenter {
                 actualNumberOfResponses++;
                 ArrayList<RideLocationUpdates> snappedPointsList = new ArrayList<>();
                 JSONArray snappedPointsArray = response.getJSONArray("snappedPoints");
-                JSONObject jsonObject = new JSONObject();
-                JSONObject locationObject = new JSONObject();
+                JSONObject jsonObject;
+                JSONObject locationObject;
 
                 for (int i = 0; i < snappedPointsArray.length(); i++) {
                     jsonObject = snappedPointsArray.getJSONObject(i);
@@ -108,13 +110,15 @@ public class RideDetailPresenter implements RideDetailContract.Presenter {
                         view.snappedPointsBuildResult(snappedPointsList);
                 }
             } catch (JSONException e) {
-
+                e.printStackTrace();
             }
         }
 
         @Override
         public void onFail(VolleyError error) {
-
+             actualNumberOfResponses++;
+             if(actualNumberOfResponses == expectedNumberOfResponses)
+                 actualNumberOfResponses = 0;
         }
     }
 
@@ -122,7 +126,7 @@ public class RideDetailPresenter implements RideDetailContract.Presenter {
     private static class DbOperationCallbackImpl implements DbManager.DbOperationCallback {
         private WeakReference<RideDetailContract.View> mView;
 
-        public DbOperationCallbackImpl(RideDetailContract.View view) {
+         DbOperationCallbackImpl(RideDetailContract.View view) {
             this.mView = new WeakReference<>(view);
         }
 

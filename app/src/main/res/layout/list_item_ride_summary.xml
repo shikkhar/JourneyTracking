@@ -26,6 +26,7 @@
                 android:id="@+id/imageViewRide"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
+                android:contentDescription="@string/static_map_marker"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/labelRideId"
                 app:srcCompat="@drawable/common_google_signin_btn_icon_dark" />

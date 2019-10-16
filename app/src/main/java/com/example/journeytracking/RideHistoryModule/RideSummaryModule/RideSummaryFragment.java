@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,6 +32,8 @@ public class RideSummaryFragment extends Fragment implements RideSummaryContract
 
     //list to feed data to the recycler view
     private List<RideDetails> rideDetailsList;
+
+    private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView recyclerView;
     //adapter associated with our recycler view
     private RideSummaryRvAdapter mAdapter;
@@ -43,7 +46,7 @@ public class RideSummaryFragment extends Fragment implements RideSummaryContract
         // Required empty public constructor
     }
 
-    //get the instacne of the activity for callbacks
+    //get the instance of the activity for callbacks
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -77,6 +80,9 @@ public class RideSummaryFragment extends Fragment implements RideSummaryContract
         recyclerView = view.findViewById(R.id.rvRideSummary);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(mAdapter);
+
+        swipeRefreshLayout = view.findViewById(R.id.swipeToRefresh);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeToRefreshListener());
     }
 
     //callback to the activity when a recycler view item is clicked
@@ -89,8 +95,17 @@ public class RideSummaryFragment extends Fragment implements RideSummaryContract
     //called when all the rides have been fetched
     @Override
     public void rideListFetched(ArrayList<RideDetails> rideList) {
+        swipeRefreshLayout.setRefreshing(false);
         rideDetailsList.addAll(rideList);
         mAdapter.notifyDataSetChanged();
+    }
+
+    private class SwipeToRefreshListener implements SwipeRefreshLayout.OnRefreshListener{
+        @Override
+        public void onRefresh() {
+            rideDetailsList.clear();
+            mPresenter.getRideDetailsList();
+        }
     }
 
     @Override

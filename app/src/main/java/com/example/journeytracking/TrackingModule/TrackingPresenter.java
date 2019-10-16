@@ -40,7 +40,7 @@ public class TrackingPresenter implements TrackingContract.Presenter {
         dbManager.insertLocationUpdates(locationUpdates, new DbOperationCallbackImpl(mView));
     }
 
-    //fucntion to update the ride when it has ended
+    //function to update the ride when it has ended
     @Override
     public void updateCurrentRide(LatLng endLocation, double distanceCovered, boolean isRideComplete, String endTime,  long rideId) {
         RideDetails rideDetails = new RideDetails(endLocation.latitude, endLocation.longitude, distanceCovered, isRideComplete, endTime, rideId );
@@ -88,7 +88,7 @@ public class TrackingPresenter implements TrackingContract.Presenter {
         //Weak reference to prevent memory leaks
         private WeakReference<TrackingContract.View> mView;
 
-        public DbOperationCallbackImpl(TrackingContract.View view) {
+         DbOperationCallbackImpl(TrackingContract.View view) {
             this.mView = new WeakReference<>(view);
         }
 

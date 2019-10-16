@@ -53,7 +53,7 @@ public class RideDetails implements Parcelable {
         this.startTime = startTime;
     }
 
-    protected RideDetails(Parcel in) {
+     RideDetails(Parcel in) {
         id = in.readLong();
         startLatitude = in.readDouble();
         startLongitude = in.readDouble();

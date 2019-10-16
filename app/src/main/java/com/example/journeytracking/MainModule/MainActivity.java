@@ -12,7 +12,7 @@ import com.example.journeytracking.TrackingModule.TrackingActivity;
 import java.lang.ref.WeakReference;
 
 /**
- * Splash Screen for our applciation
+ * Splash Screen for our app
  */
 public class MainActivity extends AppCompatActivity {
 
@@ -22,20 +22,21 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //hide the action bar
-        getSupportActionBar().hide();
+        if(getSupportActionBar() != null)
+            getSupportActionBar().hide();
 
         //posts a runnable after 1.5 seconds to launch out tracking activity
         Handler handler = new Handler();
         handler.postDelayed(new MyRunnable(this), 1500);
     }
 
-    /*Static inner class to post runnables
+    /*Static inner class to post runnable
     * holds a weak reference to our activity so that tit can be GC'ed in case the user kills the app*/
     private static class MyRunnable implements Runnable {
 
         private WeakReference<MainActivity> mInstance;
 
-        public MyRunnable(MainActivity instance) {
+         MyRunnable(MainActivity instance) {
             this.mInstance = new WeakReference<>(instance);
         }
 

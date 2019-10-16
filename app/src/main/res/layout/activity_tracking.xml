@@ -14,7 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone"
-        app:constraint_referenced_ids="textViewTimer,imageView4,textViewDistance,imageView3">
+        app:constraint_referenced_ids="textViewTimer,imageViewDistance,textViewDistance,imageViewTimer">
 
     </androidx.constraintlayout.widget.Group>
 
@@ -24,7 +24,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/imageView3"
+        app:layout_constraintBottom_toTopOf="@+id/imageViewTimer"
         app:layout_goneMarginBottom="8dp"
         map:layout_constraintEnd_toEndOf="parent"
         map:layout_constraintStart_toStartOf="parent"
@@ -50,20 +50,22 @@
 
 
     <ImageView
-        android:id="@+id/imageView3"
+        android:id="@+id/imageViewTimer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
+        android:contentDescription="@string/logo_timer"
         android:src="@drawable/baseline_av_timer_black_36"
         app:layout_constraintBottom_toTopOf="@+id/textViewTimer"
         app:layout_constraintEnd_toEndOf="@+id/textViewTimer"
         app:layout_constraintStart_toStartOf="@+id/textViewTimer" />
 
     <ImageView
-        android:id="@+id/imageView4"
+        android:id="@+id/imageViewDistance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
+        android:contentDescription="@string/logo_distance"
         android:src="@drawable/baseline_directions_run_black_36"
         app:layout_constraintBottom_toTopOf="@+id/textViewDistance"
         app:layout_constraintEnd_toEndOf="@+id/textViewDistance"

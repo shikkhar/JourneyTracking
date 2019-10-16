@@ -22,7 +22,7 @@ public class RideSummaryRvAdapter extends RecyclerView.Adapter<RideSummaryRvAdap
 
     //list to feed data to the recycler view
     private List<RideDetails> rideDetailsList;
-    //fragment instacne to implement callbacks and for context
+    //fragment instance to implement callbacks and for context
     private RideSummaryFragment containerFragment;
 
     public RideSummaryRvAdapter(List<RideDetails> rideDetailsList, RideSummaryFragment containerFragment) {
@@ -83,7 +83,7 @@ public class RideSummaryRvAdapter extends RecyclerView.Adapter<RideSummaryRvAdap
         //click listener for the items in recycler view
         private ItemClickListener itemClickListener;
 
-        public MyViewHolder(@NonNull View itemView, ItemClickListener itemClickListener) {
+         MyViewHolder(@NonNull View itemView, ItemClickListener itemClickListener) {
             super(itemView);
             rideImageView = itemView.findViewById(R.id.imageViewRide);
             rideId = itemView.findViewById(R.id.textViewRideId);
@@ -107,7 +107,7 @@ public class RideSummaryRvAdapter extends RecyclerView.Adapter<RideSummaryRvAdap
                 containerFragment.rvItemClicked(position);
         }
 
-        public void setPosition(int position) {
+         void setPosition(int position) {
             this.position = position;
         }
     }

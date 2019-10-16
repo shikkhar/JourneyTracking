@@ -20,4 +20,8 @@
     <string name="distance_km">Distance (Km):</string>
     <string name="ride_tracker">Ride Tracker</string>
     <string name="location_error">Error fetching your location</string>
+    <string name="logo_timer">timer logo</string>
+    <string name="logo_distance">distance logo</string>
+    <string name="static_map_polyline">static map polyline</string>
+    <string name="static_map_marker">static map marker</string>
 </resources>
