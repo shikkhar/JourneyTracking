@@ -25,19 +25,25 @@ import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
+ * Used to display all the rides in a recycler view
  */
 public class RideSummaryFragment extends Fragment implements RideSummaryContract.View {
 
+    //list to feed data to the recycler view
     private List<RideDetails> rideDetailsList;
     private RecyclerView recyclerView;
+    //adapter associated with our recycler view
     private RideSummaryRvAdapter mAdapter;
+    //parent activity to launch the second fragment when a recycler view item is clicked
     private RideHistoryActivity parentActivity;
+    //presenter for this fragment
     private RideSummaryPresenter mPresenter;
 
     public RideSummaryFragment() {
         // Required empty public constructor
     }
 
+    //get the instacne of the activity for callbacks
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -54,6 +60,7 @@ public class RideSummaryFragment extends Fragment implements RideSummaryContract
         rideDetailsList = new ArrayList<>();
         mAdapter = new RideSummaryRvAdapter(rideDetailsList, this);
         mPresenter = new RideSummaryPresenter(this, new DbManager(AppController.getInstance().getRideDatabaseInstance()));
+        //fetch all the rides that have been completed
         mPresenter.getRideDetailsList();
     }
 
@@ -72,12 +79,23 @@ public class RideSummaryFragment extends Fragment implements RideSummaryContract
         recyclerView.setAdapter(mAdapter);
     }
 
+    //callback to the activity when a recycler view item is clicked
+    //this method is called from the recycler view
     public void rvItemClicked(int position) {
+        parentActivity.rideSummaryItemClicked(rideDetailsList.get(position));
     }
 
+    //presenter callback method
+    //called when all the rides have been fetched
     @Override
     public void rideListFetched(ArrayList<RideDetails> rideList) {
         rideDetailsList.addAll(rideList);
         mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mPresenter.onDetach();
     }
 }

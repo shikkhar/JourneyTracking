@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RideHistoryModule.RideDetailsModule.RideDetailFragment">
+
+    <ImageView
+        android:id="@+id/imageViewRideDetail"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/common_full_open_on_phone"
+        app:layout_constraintBottom_toTopOf="@+id/guideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.85" />
+
+    <TextView
+        android:id="@+id/labelRideDetails"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@color/colorPrimaryTransparent"
+        android:paddingTop="4dp"
+        android:paddingEnd="2dp"
+        android:paddingBottom="4dp"
+        android:text="@string/ride_details"
+        android:textAlignment="textEnd"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toStartOf="@+id/textViewRideId"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageViewRideDetail" />
+
+    <TextView
+        android:id="@+id/textViewRideId"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimaryTransparent"
+        android:paddingStart="2dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/labelRideDetails"
+        app:layout_constraintTop_toTopOf="@+id/labelRideDetails"
+        tools:text="123" />
+
+    <TextView
+        android:id="@+id/labelTimeTaken"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/time_taken"
+        android:textColor="@color/design_default_color_primary_dark"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/labelRideDetails" />
+
+    <TextView
+        android:id="@+id/textViewTimeTaken"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/colorAccent"
+        android:textSize="16sp"
+        app:layout_constraintStart_toEndOf="@+id/labelTimeTaken"
+        app:layout_constraintTop_toTopOf="@+id/labelTimeTaken"
+        tools:text="@string/end_time" />
+
+    <TextView
+        android:id="@+id/labelDistance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="@string/distance_km"
+        android:textColor="@color/design_default_color_primary_dark"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/textViewDistance"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/textViewTimeTaken"
+        app:layout_constraintTop_toTopOf="@+id/textViewTimeTaken" />
+
+    <TextView
+        android:id="@+id/textViewDistance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:textColor="@color/colorAccent"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/labelDistance"
+        tools:text="@string/distance" />
+</androidx.constraintlayout.widget.ConstraintLayout>

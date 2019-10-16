@@ -1,15 +1,15 @@
 package com.example.journeytracking.Data;
 
 import androidx.room.Entity;
-import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
 
-import static androidx.room.ForeignKey.CASCADE;
+/**
+ * Represents a table within the database. Room creates a table for each class that has @Entity annotation,
+ * the fields in the class correspond to columns in the table. Therefore, the entity classes tend to be small
+ * model classes that don’t contain any logic.
+ */
 
-@Entity(tableName = "ride_location_updates"/*, foreignKeys = @ForeignKey(entity = RideDetails.class,
-        parentColumns = "id",
-        childColumns = "rideId",
-        onDelete = CASCADE)*/)
+@Entity(tableName = "ride_location_updates")
 public class RideLocationUpdates {
 
     @PrimaryKey(autoGenerate = true)

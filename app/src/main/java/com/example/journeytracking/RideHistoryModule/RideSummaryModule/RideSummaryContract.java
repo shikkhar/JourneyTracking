@@ -7,6 +7,7 @@ import java.util.ArrayList;
 public class RideSummaryContract {
     interface Presenter{
         void getRideDetailsList();
+        void onDetach();
     }
     interface View{
         void rideListFetched(ArrayList<RideDetails> rideList);

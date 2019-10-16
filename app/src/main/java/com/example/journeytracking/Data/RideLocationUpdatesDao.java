@@ -7,12 +7,15 @@ import androidx.room.Query;
 import androidx.room.Update;
 
 import java.util.List;
-
+/**
+ * DAOs are responsible for defining the methods that access the database
+ *
+ */
 @Dao
 public interface RideLocationUpdatesDao {
 
-    @Query("Select * from ride_location_updates")
-    List<RideLocationUpdates> getRideLocationUpdatesList ();
+    @Query("Select * from ride_location_updates WHERE rideId = :rideId")
+    List<RideLocationUpdates> getRideLocationUpdatesList (Long rideId);
 
     @Insert
     long insertRideLocationUpdates(RideLocationUpdates rideLocationUpdates);

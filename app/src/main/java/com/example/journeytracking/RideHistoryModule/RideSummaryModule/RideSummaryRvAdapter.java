@@ -12,15 +12,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.journeytracking.Data.RideDetails;
 import com.example.journeytracking.R;
+import com.example.journeytracking.Utils.GoogleApiRequestBuilder;
 import com.example.journeytracking.Utils.Utils;
 
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class RideSummaryRvAdapter extends RecyclerView.Adapter<RideSummaryRvAdapter.MyViewHolder> {
 
+    //list to feed data to the recycler view
     private List<RideDetails> rideDetailsList;
+    //fragment instacne to implement callbacks and for context
     private RideSummaryFragment containerFragment;
 
     public RideSummaryRvAdapter(List<RideDetails> rideDetailsList, RideSummaryFragment containerFragment) {
@@ -38,10 +40,13 @@ public class RideSummaryRvAdapter extends RecyclerView.Adapter<RideSummaryRvAdap
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+        //update the position in the click listener
         holder.itemClickListener.setPosition(position);
+        //get the corresponding list value
         RideDetails rideDetails = rideDetailsList.get(position);
 
-        String request = buildRequest(rideDetails);
+        //build a GET request to get static map with two markers to be displayed in the image view
+        String request = GoogleApiRequestBuilder.staticMapMarkersRequest(rideDetails, containerFragment.getString(R.string.google_maps_key));
         Glide.with(containerFragment.getContext().getApplicationContext())
                 .load(request)
                 .placeholder(R.drawable.default_image)
@@ -49,7 +54,7 @@ public class RideSummaryRvAdapter extends RecyclerView.Adapter<RideSummaryRvAdap
                 .into(holder.rideImageView);
 
         holder.rideId.setText(String.valueOf(rideDetails.id));
-        holder.distance.setText(String.valueOf(rideDetails.distanceCovered));
+        holder.distance.setText(String.format("%.2f", rideDetails.distanceCovered));
         try {
             holder.rideDate.setText(Utils.getDate(rideDetails.startTime));
             holder.startTime.setText(Utils.getTime(rideDetails.startTime));
@@ -61,18 +66,11 @@ public class RideSummaryRvAdapter extends RecyclerView.Adapter<RideSummaryRvAdap
 
     }
 
-    private String buildRequest(RideDetails rideDetails) {
-        String size = "size=100x100";
-        String startMarker = "&markers=size:tiny|color:green|" + rideDetails.startLatitude +"," + rideDetails.startLongitude;
-        String endMarker = "&markers=size:mid|color:red|" + rideDetails.endLatitude +"," + rideDetails.endLongitude;
-        String request = "https://maps.googleapis.com/maps/api/staticmap?" +size+startMarker+endMarker+containerFragment.getString(R.string.google_maps_key);
-        return request;
-    }
-
     @Override
     public int getItemCount() {
         return rideDetailsList.size();
     }
+
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
@@ -82,6 +80,7 @@ public class RideSummaryRvAdapter extends RecyclerView.Adapter<RideSummaryRvAdap
         private TextView startTime;
         private TextView endTime;
         private TextView distance;
+        //click listener for the items in recycler view
         private ItemClickListener itemClickListener;
 
         public MyViewHolder(@NonNull View itemView, ItemClickListener itemClickListener) {
@@ -98,7 +97,8 @@ public class RideSummaryRvAdapter extends RecyclerView.Adapter<RideSummaryRvAdap
     }
 
     private class ItemClickListener implements View.OnClickListener{
-
+        //every time a view holder is bound to a new view position is updated
+        //so we can fetch the correct item from the list
         private int position;
 
         @Override

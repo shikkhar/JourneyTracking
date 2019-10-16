@@ -4,21 +4,32 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/constraintLayoutTrackingActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.journeytracking.TrackingModule.TrackingActivity">
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/viewGroupTimeDistance"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:constraint_referenced_ids="textViewTimer,imageView4,textViewDistance,imageView3">
+
+    </androidx.constraintlayout.widget.Group>
 
     <fragment
         android:id="@+id/map"
         class="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/imageView3"
         app:layout_goneMarginBottom="8dp"
-        map:layout_constraintBottom_toTopOf="@+id/textViewTimer"
         map:layout_constraintEnd_toEndOf="parent"
         map:layout_constraintStart_toStartOf="parent"
         map:layout_constraintTop_toTopOf="parent" />
+
 
     <TextView
         android:id="@+id/textViewTimer"
@@ -29,13 +40,34 @@
         android:layout_marginBottom="16dp"
         android:textAlignment="center"
         android:textSize="30sp"
-        android:visibility="gone"
+        android:textStyle="bold"
+        android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toStartOf="@+id/textViewDistance"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         tools:text="TextView" />
 
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:src="@drawable/baseline_av_timer_black_36"
+        app:layout_constraintBottom_toTopOf="@+id/textViewTimer"
+        app:layout_constraintEnd_toEndOf="@+id/textViewTimer"
+        app:layout_constraintStart_toStartOf="@+id/textViewTimer" />
+
+    <ImageView
+        android:id="@+id/imageView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:src="@drawable/baseline_directions_run_black_36"
+        app:layout_constraintBottom_toTopOf="@+id/textViewDistance"
+        app:layout_constraintEnd_toEndOf="@+id/textViewDistance"
+        app:layout_constraintStart_toStartOf="@+id/textViewDistance" />
 
     <TextView
         android:id="@+id/textViewDistance"
@@ -46,7 +78,8 @@
 
         android:textAlignment="center"
         android:textSize="30sp"
-        android:visibility="gone"
+        android:textStyle="bold"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="@+id/textViewTimer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -72,7 +105,9 @@
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
             android:text="@string/start_tracking"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium">
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:strokeColor="@color/colorAccent"
+            app:strokeWidth="1dp">
 
         </com.google.android.material.button.MaterialButton>
 
@@ -86,7 +121,8 @@
             android:layout_weight="1"
             android:text="@string/stop_tracking"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:visibility="gone">
+            android:visibility="gone"
+            app:strokeColor="@color/colorAccent">
 
         </com.google.android.material.button.MaterialButton>
 
@@ -99,17 +135,11 @@
             android:layout_marginEnd="16dp"
             android:layout_weight="1"
             android:text="@string/ride_history"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium">
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:strokeColor="@color/colorAccent">
 
         </com.google.android.material.button.MaterialButton>
 
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout><!--<fragment xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--    xmlns:map="http://schemas.android.com/apk/res-auto"-->
-    <!--    xmlns:tools="http://schemas.android.com/tools"-->
-    <!--    android:id="@+id/map"-->
-    <!--    android:name="com.google.android.gms.maps.SupportMapFragment"-->
-    <!--    android:layout_width="match_parent"-->
-    <!--    android:layout_height="match_parent"-->
-    <!--    tools:context=".TrackingModule.TrackingActivity" />-->
+</androidx.constraintlayout.widget.ConstraintLayout>

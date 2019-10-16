@@ -37,6 +37,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="16dp"
                 android:text="@string/ride_id"
+                android:textStyle="bold"
                 app:layout_constraintStart_toEndOf="@+id/imageViewRide"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -55,6 +56,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:text="@string/date"
+                android:textStyle="bold"
                 app:layout_constraintEnd_toStartOf="@+id/textViewDate"
                 app:layout_constraintHorizontal_bias="1.0"
                 app:layout_constraintStart_toEndOf="@+id/textViewRideId"
@@ -84,6 +86,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="@string/start_time"
+                android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="@+id/labelRideId"
                 app:layout_constraintTop_toBottomOf="@+id/divider" />
 
@@ -102,6 +105,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="@string/end_time"
+                android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="@+id/labelStartTime"
                 app:layout_constraintTop_toBottomOf="@+id/labelStartTime" />
 
@@ -130,6 +134,8 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
                 android:text="@string/distance"
+                android:textColor="@color/design_default_color_primary_dark"
+                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/labelEndTime"
                 app:layout_constraintTop_toBottomOf="@+id/divider2" />
@@ -139,6 +145,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
+                android:textColor="@color/colorAccent"
                 app:layout_constraintStart_toEndOf="@+id/labelDistance"
                 app:layout_constraintTop_toTopOf="@+id/labelDistance"
                 tools:text="@string/distance" />

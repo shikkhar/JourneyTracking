@@ -14,6 +14,10 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 
+/**
+ * This class provides location updates based on the location request object
+ * using the fused provider client
+ */
 public class AppLocationManager {
     private FusedLocationProviderClient fusedLocationProviderClient;
 
@@ -21,15 +25,21 @@ public class AppLocationManager {
         this.fusedLocationProviderClient = new FusedLocationProviderClient(context);
     }
 
+    //provides location updates to the callback object in the thread associated with the looper
     public void requestLocationUpdates(LocationRequest locationRequest, LocationCallback locationCallback, Looper looper){
-        this.fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, looper);
+        try {
+            this.fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, looper);
+        } catch(IllegalStateException e){
+            e.printStackTrace();
+        }
     }
 
     public void removeLocationUpdates(LocationCallback locationCallback){
-        this.fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+        try {
+            this.fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+        } catch(IllegalStateException e){
+            e.printStackTrace();
+        }
     }
 
-    /*public void getStartLocation(OnCompleteListener<Location> locationCallback){
-        fusedLocationProviderClient.getLastLocation().addOnCompleteListener(locationCallback);
-    }*/
 }

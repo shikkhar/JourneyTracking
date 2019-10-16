@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="preloaded_fonts" translatable="false">
+        <item>@font/aclonica</item>
+        <item>@font/bilbo_swash_caps</item>
+        <item>@font/cedarville_cursive</item>
+        <item>@font/hanalei_fill</item>
+        <item>@font/leckerli_one</item>
+        <item>@font/nothing_you_could_do</item>
+        <item>@font/petit_formal_script</item>
+        <item>@font/ruthie</item>
+    </array>
+</resources>

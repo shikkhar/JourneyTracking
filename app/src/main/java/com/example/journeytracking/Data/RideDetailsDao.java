@@ -4,14 +4,17 @@ import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
-
-import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * DAOs are responsible for defining the methods that access the database
+ *
+ */
 @Dao
 public interface RideDetailsDao {
 
-    @Query("Select * from ride_details ORDER BY id DESC")
+
+    @Query("Select * from ride_details WHERE isRideComplete = 1 ORDER BY id DESC")
     List<RideDetails> getRideDetailsList ();
 
     @Insert
