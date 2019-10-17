@@ -1,6 +1,7 @@
 package com.example.journeytracking.RideHistoryModule.RideDetailsModule;
 
 import android.os.SystemClock;
+import android.util.Log;
 
 import com.android.volley.VolleyError;
 import com.example.journeytracking.Data.RideDetails;
@@ -20,6 +21,8 @@ import java.util.ArrayList;
 import static com.example.journeytracking.Utils.CONSTANTS.VolleyRequestTags.SNAP_TO_ROAD;
 
 public class RideDetailPresenter implements RideDetailContract.Presenter {
+
+    private static final String TAG = "RideDetailPresenter";
     //fragment instance to initiate callbacks
     private RideDetailContract.View mView;
     //db manager to execute queries
@@ -53,7 +56,6 @@ public class RideDetailPresenter implements RideDetailContract.Presenter {
         int numberOfResponses = urls.size();
         for (String url : urls) {
             apiRequestManager.snapToRoad(url, SNAP_TO_ROAD, new VolleyRequestCallbackImpl(mView, numberOfResponses));
-            SystemClock.sleep(700);
         }
     }
 
@@ -116,6 +118,7 @@ public class RideDetailPresenter implements RideDetailContract.Presenter {
 
         @Override
         public void onFail(VolleyError error) {
+            Log.d(TAG, "onFail: " + error.getMessage());
              actualNumberOfResponses++;
              if(actualNumberOfResponses == expectedNumberOfResponses)
                  actualNumberOfResponses = 0;

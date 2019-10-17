@@ -45,6 +45,9 @@ public class RideDetailFragment extends Fragment implements RideDetailContract.V
 
     //list of all the locations of a ride
     private ArrayList<RideLocationUpdates> snappedLocationUpdates;
+    private ArrayList<ArrayList<RideLocationUpdates>> resultList;
+
+    private int responsesReceived;
 
     public RideDetailFragment() {
         // Required empty public constructor
@@ -61,6 +64,7 @@ public class RideDetailFragment extends Fragment implements RideDetailContract.V
         }
 
         snappedLocationUpdates = new ArrayList<>();
+        resultList = new ArrayList<>();
         mPresenter = new RideDetailPresenter(this, new DbManager(AppController.getInstance().getRideDatabaseInstance()), new ApiRequestManager());
         //get a list of all the locations of a ride
         mPresenter.getRideLocationList(rideDetails.id);
@@ -104,6 +108,7 @@ public class RideDetailFragment extends Fragment implements RideDetailContract.V
     // snapping to the roads provides a more uniform polyline which otherwise would not be possible due to fluctuating gps signals
     @Override
     public void onRideLocationListFetched(ArrayList<RideLocationUpdates> rideLocationUpdatesList) {
+        int numberOfResponses = (int) Math.ceil(rideLocationUpdatesList.size()/100.00);
         mPresenter.snapToRoad(rideLocationUpdatesList, getString(R.string.google_maps_key));
     }
 
@@ -112,12 +117,14 @@ public class RideDetailFragment extends Fragment implements RideDetailContract.V
     //and the results are then tied together to give the final static image
     @Override
     public void snappedPointsBuildResult(ArrayList<RideLocationUpdates> snappedPointsList) {
+        resultList.add(snappedPointsList);
         this.snappedLocationUpdates.addAll(snappedPointsList);
     }
 
     //last result from the roads api
     @Override
     public void snappedPointsFinalResult(ArrayList<RideLocationUpdates> snappedPointsList) {
+        resultList.add(snappedPointsList);
         this.snappedLocationUpdates.addAll(snappedPointsList);
 
         String imageHeight = String.valueOf(Utils.getDisplayHeight(getContext().getApplicationContext()));
@@ -125,7 +132,7 @@ public class RideDetailFragment extends Fragment implements RideDetailContract.V
 
         //build a request to get a static map with polyline path
         //right now return a map of max size 64x640 due to account restrictions
-        String request = GoogleApiRequestBuilder.staticMapPolyLineRequestBuilder(imageWidth, imageHeight, rideDetails, snappedLocationUpdates, this.getString(R.string.google_maps_key));
+        String request = GoogleApiRequestBuilder.staticMapPolyLineRequestBuilder(imageWidth, imageHeight, rideDetails, resultList/*snappedLocationUpdates*/, this.getString(R.string.google_maps_key));
 
         Glide.with(getContext().getApplicationContext())
                 .load(request)

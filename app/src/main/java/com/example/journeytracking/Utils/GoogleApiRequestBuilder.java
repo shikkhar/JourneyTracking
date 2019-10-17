@@ -57,16 +57,21 @@ public class GoogleApiRequestBuilder {
 
     //Request Builder for static Maps with polyline
     public static String staticMapPolyLineRequestBuilder(String imageWidth, String imageHeight, RideDetails rideDetails,
-                                                 ArrayList<RideLocationUpdates> snappedLocationUpdates, String api){
+                                                 ArrayList<ArrayList<RideLocationUpdates>> snappedLocationUpdates, String api){
 
+        StringBuilder requestString = new StringBuilder();
         String size = "size=" + imageWidth + "x" + imageHeight;
         String startMarker = "&markers=size:small|color:green|" + rideDetails.startLatitude +"," + rideDetails.startLongitude;
         String endMarker = "&markers=size:mid|color:red|" + rideDetails.endLatitude +"," + rideDetails.endLongitude;
 
+        requestString.append(STATIC_MAP_API_ENDPOINT + size  + startMarker + endMarker);
 
-        String path = "&path=color:blue|weight:5|geodesic:true" + stringBuilder(snappedLocationUpdates);
+        for (ArrayList<RideLocationUpdates>  locationList:snappedLocationUpdates) {
+            requestString.append("&path=color:blue|weight:5|geodesic:true" + stringBuilder(locationList));
+        }
 
-        return STATIC_MAP_API_ENDPOINT + size  + startMarker + endMarker + path + "&key=" + api;
+
+        return requestString.append("&key=" + api).toString();
     }
 
     public static String staticMapMarkersRequest(RideDetails rideDetails, String api) {
